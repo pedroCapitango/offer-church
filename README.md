@@ -19,6 +19,7 @@
 - Scripts NPM
 - Testes
 - Roadmap de Melhorias
+ - Deploy no Render
 
 ## Visão Geral
 
@@ -175,3 +176,66 @@ MIT
 
 ---
 Se algo estiver desatualizado, abra uma issue ou PR. Boa contribuição! 🙌
+
+## Deploy no Render
+
+Passo a passo para publicar a API no Render (https://render.com):
+
+1. Banco de Dados
+	- Crie um serviço Managed PostgreSQL (Render Dashboard → New → PostgreSQL).
+	- Após provisionado, copie a Internal Database URL.
+	- Monte a `DATABASE_URL` no formato: `postgresql://USER:PASSWORD@HOST:PORT/DBNAME?schema=public`.
+
+2. Repositório
+	- Garanta que o código (incluindo `prisma/` e `Dockerfile` ou scripts build) está na branch principal.
+	- Render pode usar build via Node direto; Dockerfile é opcional (a versão atual funciona sem Dockerfile usando build command).
+
+3. Criar Serviço Web
+	- New → Web Service → Conecte o repositório GitHub.
+	- Root Directory: se o projeto estiver em subpasta `tesouraria`, defina `tesouraria`.
+	- Runtime: Node
+	- Build Command: `npm install && npm run build`
+	- Start Command: `npm run start:prod`
+
+4. Variáveis de Ambiente
+	Defina em Settings → Environment:
+	- `DATABASE_URL` = (URL do Postgres Render Internal)
+	- `JWT_SECRET` = (chave forte)
+	- `PORT` = 10000 (Render injeta automaticamente, mas explicitamos por segurança) OU deixe sem e o Render usa a variável padrão.
+	- `UPLOAD_DIR` = uploads
+	- (Opcional) `LOG_LEVEL` = log
+
+5. Migrações Prisma
+	- O script `start:prod` já executa `prisma migrate deploy` antes de subir o servidor.
+	- Alternativa manual: Use Deploy Hooks ou um Job separado com comando `npx prisma migrate deploy`.
+
+6. Health Check
+	- Configure o health check em Settings apontando para `/health` (GET) com tempo de timeout padrão.
+
+7. Uploads / Arquivos
+	- Render usa filesystem ephemeral (reseta em deploy). Para persistência real, mover futuramente para S3.
+	- Enquanto isso, para ambiente de staging/demonstração, aceita-se volátil.
+
+8. Swagger
+	- Disponível em `/api` após deploy (ex: https://seuservico.onrender.com/api).
+
+9. Logs
+	- Acompanhe em Logs do serviço Render; saída inclui criação condicional do diretório de uploads.
+
+10. Atualizações
+	- Cada push na branch configurada dispara novo deploy (CI automático do Render).
+
+11. Rollback
+	- Use a aba Deploys para reverter a um deploy anterior caso necessário.
+
+12. Troubleshooting Rápido
+	- Erro ao conectar banco: verifique `DATABASE_URL` (usar Internal URL, não External) e se migrações criaram tabelas.
+	- 404 em `/api`: confirme que build rodou; veja logs de build.
+	- 500 em movimentos com upload: validar que `uploads/` foi criado (log bootstrap) e que multipart está correto.
+
+13. Próximos Passos para Produção Real
+	- Mover arquivos para storage S3 (signed URLs)
+	- Adicionar monitoramento (Prometheus, OpenTelemetry)
+	- Implementar refresh token e rotacionar secrets
+	- Rate limiting / throttling (Nest Throttler)
+	- WAF/Firewall (Cloudflare ou similar)
