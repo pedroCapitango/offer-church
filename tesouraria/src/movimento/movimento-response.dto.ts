@@ -16,11 +16,11 @@ export class MovimentoResponseDto {
   @ApiProperty({ example: 150.5 })
   valor: number;
 
-  @ApiProperty({ example: 'CAMPANHA', required: false })
-  tipoOferta?: string;
+  @ApiProperty({ example: 'CAMPANHA', required: false, nullable: true })
+  tipoOferta?: string | null;
 
-  @ApiProperty({ example: '/uploads/169487234-comprovante.jpg', required: false })
-  comprovante?: string;
+  @ApiProperty({ example: '/uploads/169487234-comprovante.jpg', required: false, nullable: true })
+  comprovante?: string | null;
 
   @ApiProperty({ example: '2025-09-16T12:20:00.000Z' })
   data: string;

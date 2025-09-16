@@ -40,22 +40,49 @@ export class MovimentoController {
     if (!data.tipo || !data.nome || !data.contato || isNaN(data.valor)) {
       throw new Error('Campos obrigatórios ausentes ou inválidos');
     }
-    return this.service.create(data);
+    return this.service.create(data).then((m: any) => ({
+      id: m.id,
+      tipo: m.tipo,
+      nome: m.nome,
+      contato: m.contato,
+      valor: m.valor,
+      tipoOferta: m.tipoOferta ?? null,
+      comprovante: m.comprovante ?? null,
+      data: m.data instanceof Date ? m.data.toISOString() : m.data,
+    }));
   }
 
   @Get()
   @ApiOperation({ summary: 'Listar todos os movimentos' })
   @ApiOkResponse({ type: MovimentoResponseDto, isArray: true })
-  findAll() {
-    return this.service.findAll();
+  findAll(): Promise<MovimentoResponseDto[]> {
+    return this.service.findAll().then(rows => rows.map((m: any) => ({
+      id: m.id,
+      tipo: m.tipo,
+      nome: m.nome,
+      contato: m.contato,
+      valor: m.valor,
+      tipoOferta: m.tipoOferta ?? null,
+      comprovante: m.comprovante ?? null,
+      data: m.data instanceof Date ? m.data.toISOString() : m.data,
+    })));
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Buscar movimento por ID' })
   @ApiOkResponse({ type: MovimentoResponseDto })
   @ApiNotFoundResponse({ type: ErrorResponseDto })
-  findOne(@Param('id') id: number) {
-    return this.service.findOne(Number(id));
+  findOne(@Param('id') id: number): Promise<MovimentoResponseDto | null> {
+    return this.service.findOne(Number(id)).then((m: any) => m ? ({
+      id: m.id,
+      tipo: m.tipo,
+      nome: m.nome,
+      contato: m.contato,
+      valor: m.valor,
+      tipoOferta: m.tipoOferta ?? null,
+      comprovante: m.comprovante ?? null,
+      data: m.data instanceof Date ? m.data.toISOString() : m.data,
+    }) : null);
   }
 
   @Put(':id')
@@ -83,7 +110,16 @@ export class MovimentoController {
       tipoOferta: raw.tipoOferta,
     };
     if (file) data.comprovante = `/uploads/${file.filename}`;
-    return this.service.update(Number(id), data);
+    return this.service.update(Number(id), data).then((m: any) => ({
+      id: m.id,
+      tipo: m.tipo,
+      nome: m.nome,
+      contato: m.contato,
+      valor: m.valor,
+      tipoOferta: m.tipoOferta ?? null,
+      comprovante: m.comprovante ?? null,
+      data: m.data instanceof Date ? m.data.toISOString() : m.data,
+    }));
   }
 
   @Delete(':id')

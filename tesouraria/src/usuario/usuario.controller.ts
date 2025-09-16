@@ -4,6 +4,7 @@ import { UsuarioService } from './usuario.service';
 import { UsuarioDto } from './usuario.dto';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiNotFoundResponse, ApiBadRequestResponse } from '@nestjs/swagger';
 import { UsuarioResponseDto } from './usuario-response.dto';
+import { EnvelopeDto } from '../common/dto/envelope.dto';
 import { ErrorResponseDto } from '../common/dto/error-response.dto';
 
 @ApiTags('usuario')
@@ -15,7 +16,7 @@ export class UsuarioController {
   @ApiOperation({ summary: 'Criar novo usuário' })
   @ApiCreatedResponse({ type: UsuarioResponseDto, description: 'Usuário criado com sucesso' })
   @ApiBadRequestResponse({ type: ErrorResponseDto })
-  create(@Body() data: UsuarioDto) {
+  create(@Body() data: UsuarioDto): Promise<UsuarioResponseDto> {
     return this.service.create(data);
   }
 
@@ -24,7 +25,7 @@ export class UsuarioController {
   @Get()
   @ApiOperation({ summary: 'Listar todos os usuários' })
   @ApiOkResponse({ type: UsuarioResponseDto, isArray: true })
-  findAll() {
+  async findAll(): Promise<UsuarioResponseDto[]> {
     return this.service.findAll();
   }
 
@@ -34,7 +35,7 @@ export class UsuarioController {
   @ApiOperation({ summary: 'Buscar usuário por ID' })
   @ApiOkResponse({ type: UsuarioResponseDto })
   @ApiNotFoundResponse({ type: ErrorResponseDto })
-  findOne(@Param('id') id: number) {
+  findOne(@Param('id') id: number): Promise<UsuarioResponseDto | null> {
     return this.service.findOne(Number(id));
   }
 
@@ -44,7 +45,7 @@ export class UsuarioController {
   @ApiOperation({ summary: 'Atualizar usuário' })
   @ApiOkResponse({ type: UsuarioResponseDto })
   @ApiNotFoundResponse({ type: ErrorResponseDto })
-  update(@Param('id') id: number, @Body() data: Partial<UsuarioDto>) {
+  update(@Param('id') id: number, @Body() data: Partial<UsuarioDto>): Promise<UsuarioResponseDto> {
     return this.service.update(Number(id), data);
   }
 
