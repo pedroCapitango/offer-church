@@ -4,7 +4,9 @@ import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { MovimentoService } from './movimento.service';
 import { MovimentoDto } from './movimento.dto';
-import { ApiTags, ApiOperation, ApiConsumes, ApiBody } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiConsumes, ApiBody, ApiCreatedResponse, ApiOkResponse, ApiNotFoundResponse, ApiBadRequestResponse } from '@nestjs/swagger';
+import { MovimentoResponseDto } from './movimento-response.dto';
+import { ErrorResponseDto } from '../common/dto/error-response.dto';
 
 @ApiTags('movimento')
 @Controller('movimento')
@@ -22,6 +24,8 @@ export class MovimentoController {
     }),
   }))
   @ApiOperation({ summary: 'Criar novo movimento (multipart: campos + comprovante)' })
+  @ApiCreatedResponse({ type: MovimentoResponseDto })
+  @ApiBadRequestResponse({ type: ErrorResponseDto })
   @ApiConsumes('multipart/form-data')
   @ApiBody({ schema: { type: 'object', properties: { tipo: { type: 'string', enum: ['DIZIMO','OFERTA'] }, nome: { type: 'string' }, contato: { type: 'string' }, valor: { type: 'number' }, tipoOferta: { type: 'string' }, comprovante: { type: 'string', format: 'binary' } }, required: ['tipo','nome','contato','valor'] } })
   create(@Body() raw: any, @UploadedFile() file?: Express.Multer.File) {
@@ -41,12 +45,15 @@ export class MovimentoController {
 
   @Get()
   @ApiOperation({ summary: 'Listar todos os movimentos' })
+  @ApiOkResponse({ type: MovimentoResponseDto, isArray: true })
   findAll() {
     return this.service.findAll();
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Buscar movimento por ID' })
+  @ApiOkResponse({ type: MovimentoResponseDto })
+  @ApiNotFoundResponse({ type: ErrorResponseDto })
   findOne(@Param('id') id: number) {
     return this.service.findOne(Number(id));
   }
@@ -62,6 +69,9 @@ export class MovimentoController {
     }),
   }))
   @ApiOperation({ summary: 'Atualizar movimento (enviar novo comprovante opcional)' })
+  @ApiOkResponse({ type: MovimentoResponseDto })
+  @ApiNotFoundResponse({ type: ErrorResponseDto })
+  @ApiBadRequestResponse({ type: ErrorResponseDto })
   @ApiConsumes('multipart/form-data')
   @ApiBody({ schema: { type: 'object', properties: { tipo: { type: 'string', enum: ['DIZIMO','OFERTA'] }, nome: { type: 'string' }, contato: { type: 'string' }, valor: { type: 'number' }, tipoOferta: { type: 'string' }, comprovante: { type: 'string', format: 'binary' } } } })
   update(@Param('id') id: number, @Body() raw: any, @UploadedFile() file?: Express.Multer.File) {
@@ -78,6 +88,8 @@ export class MovimentoController {
 
   @Delete(':id')
   @ApiOperation({ summary: 'Remover movimento' })
+  @ApiOkResponse({ description: 'Movimento removido' })
+  @ApiNotFoundResponse({ type: ErrorResponseDto })
   remove(@Param('id') id: number) {
     return this.service.remove(Number(id));
   }
