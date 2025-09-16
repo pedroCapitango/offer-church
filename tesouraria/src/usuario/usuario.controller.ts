@@ -2,7 +2,9 @@ import { Controller, Get, Post, Body, Param, Put, Delete, UseGuards } from '@nes
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { UsuarioService } from './usuario.service';
 import { UsuarioDto } from './usuario.dto';
-import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiNotFoundResponse, ApiBadRequestResponse } from '@nestjs/swagger';
+import { UsuarioResponseDto } from './usuario-response.dto';
+import { ErrorResponseDto } from '../common/dto/error-response.dto';
 
 @ApiTags('usuario')
 @Controller('usuario')
@@ -11,6 +13,8 @@ export class UsuarioController {
 
   @Post()
   @ApiOperation({ summary: 'Criar novo usuário' })
+  @ApiCreatedResponse({ type: UsuarioResponseDto, description: 'Usuário criado com sucesso' })
+  @ApiBadRequestResponse({ type: ErrorResponseDto })
   create(@Body() data: UsuarioDto) {
     return this.service.create(data);
   }
@@ -19,6 +23,7 @@ export class UsuarioController {
   @ApiBearerAuth()
   @Get()
   @ApiOperation({ summary: 'Listar todos os usuários' })
+  @ApiOkResponse({ type: UsuarioResponseDto, isArray: true })
   findAll() {
     return this.service.findAll();
   }
@@ -27,6 +32,8 @@ export class UsuarioController {
   @ApiBearerAuth()
   @Get(':id')
   @ApiOperation({ summary: 'Buscar usuário por ID' })
+  @ApiOkResponse({ type: UsuarioResponseDto })
+  @ApiNotFoundResponse({ type: ErrorResponseDto })
   findOne(@Param('id') id: number) {
     return this.service.findOne(Number(id));
   }
@@ -35,6 +42,8 @@ export class UsuarioController {
   @ApiBearerAuth()
   @Put(':id')
   @ApiOperation({ summary: 'Atualizar usuário' })
+  @ApiOkResponse({ type: UsuarioResponseDto })
+  @ApiNotFoundResponse({ type: ErrorResponseDto })
   update(@Param('id') id: number, @Body() data: Partial<UsuarioDto>) {
     return this.service.update(Number(id), data);
   }
@@ -43,6 +52,8 @@ export class UsuarioController {
   @ApiBearerAuth()
   @Delete(':id')
   @ApiOperation({ summary: 'Remover usuário' })
+  @ApiOkResponse({ description: 'Usuário removido' })
+  @ApiNotFoundResponse({ type: ErrorResponseDto })
   remove(@Param('id') id: number) {
     return this.service.remove(Number(id));
   }
