@@ -7,10 +7,15 @@ import { join } from 'path';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const config = new DocumentBuilder()
-    .setTitle('API Documentation')
-    .setDescription('Documentação automática gerada pelo Swagger')
-    .setVersion('1.0')
-    .addBearerAuth({ type: 'http', scheme: 'bearer', bearerFormat: 'JWT' })
+    .setTitle('Offer Church - Tesouraria API')
+    .setDescription('API para gestão de movimentos financeiros, usuários e dashboard do tesoureiro.')
+    .setVersion('1.0.0')
+    .addServer('http://localhost:' + (process.env.PORT || 3000), 'Local')
+    .addBearerAuth({ type: 'http', scheme: 'bearer', bearerFormat: 'JWT', description: 'Insira o token JWT obtido em /auth/login' })
+    .addTag('auth', 'Autenticação e emissão de tokens')
+    .addTag('usuario', 'Gestão de usuários (CRUD)')
+    .addTag('movimento', 'Registro de dízimos e ofertas')
+    .addTag('dashboard', 'Indicadores e séries para o painel')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
