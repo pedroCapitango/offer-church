@@ -1,4 +1,15 @@
 {
+  "name": "offer-church-root",
+  "private": true,
+  "workspaces": [
+    "tesouraria"
+  ],
+  "scripts": {
+    "postinstall": "cd tesouraria && npm install",
+    "build": "cd tesouraria && npm run build",
+    "start": "cd tesouraria && npm run start",
+    "start:prod": "cd tesouraria && npm run start:prod"
+  },
   "dependencies": {
     "g": "^2.0.1",
     "npm": "^11.6.0"
