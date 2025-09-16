@@ -4,6 +4,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
 import { ValidationPipe } from '@nestjs/common';
+import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -29,6 +30,9 @@ async function bootstrap() {
     forbidNonWhitelisted: true,
     transformOptions: { enableImplicitConversion: true },
   }));
+
+  // Filtro global de exceções para padronizar respostas de erro
+  app.useGlobalFilters(new AllExceptionsFilter());
 
   // Garante que diretório de uploads exista (ex: Render ephemeral system no build step)
   const uploadDir = process.env.UPLOAD_DIR || 'uploads';
