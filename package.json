@@ -1,6 +1,10 @@
 {
   "name": "offer-church-root",
   "private": true,
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=9.0.0"
+  },
   "workspaces": [
     "tesouraria"
   ],

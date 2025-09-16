@@ -44,6 +44,35 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
+## CORS (Cross-Origin Resource Sharing)
+
+Para liberar o acesso do CORS para o frontend, configure as variáveis de ambiente:
+
+- `CORS_ORIGIN`: lista de origins permitidos, separados por vírgula. Use `*` ou deixe vazio para permitir todos (apenas recomendado em dev).
+- `CORS_CREDENTIALS`: `true` para permitir cookies/credenciais (apenas quando os origins são explícitos, não com `*`). Padrão: `false`.
+
+Exemplos:
+
+Desenvolvimento (Vite em localhost):
+
+```bash
+export CORS_ORIGIN=http://localhost:5173
+export CORS_CREDENTIALS=false
+npm run start:dev
+```
+
+Produção (Render): ver `render.yaml`. Exemplo de configurações:
+
+```yaml
+envVars:
+  - key: CORS_ORIGIN
+    value: https://offer-church-frontend.example.com,http://localhost:5173
+  - key: CORS_CREDENTIALS
+    value: "false"
+```
+
+No bootstrap (`src/main.ts`), o CORS está habilitado e lê essas variáveis. Headers expostos incluem `Content-Disposition` para permitir download de arquivos.
+
 ## Run tests
 
 ```bash

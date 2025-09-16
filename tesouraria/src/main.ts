@@ -35,11 +35,30 @@ async function bootstrap() {
   app.useGlobalFilters(new AllExceptionsFilter());
 
   // CORS para permitir consumo pelo frontend (Vite em dev e origin configurável em prod)
+  const corsOriginsEnv = process.env.CORS_ORIGIN;
+  const parsedOrigins = corsOriginsEnv
+    ? corsOriginsEnv
+        .split(',')
+        .map((o) => o.trim())
+        .filter((o) => !!o)
+    : [];
+  const allowAll = parsedOrigins.length === 0 || parsedOrigins.includes('*');
+  const corsCredentials = (process.env.CORS_CREDENTIALS || 'false').toLowerCase() === 'true';
+
   app.enableCors({
-    origin: process.env.CORS_ORIGIN?.split(',') || true,
-    credentials: false,
+    origin: allowAll ? true : parsedOrigins,
+    credentials: corsCredentials,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
+    exposedHeaders: ['Content-Disposition'],
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
+  });
+  // eslint-disable-next-line no-console
+  console.log('[CORS]', {
+    allowAll,
+    origins: allowAll ? '*' : parsedOrigins,
+    credentials: corsCredentials,
   });
 
   // Garante que diretório de uploads exista (ex: Render ephemeral system no build step)
