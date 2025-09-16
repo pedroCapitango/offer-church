@@ -1,7 +1,9 @@
 import { Controller, Post, Body, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthDto } from './auth.dto';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiOkResponse, ApiUnauthorizedResponse, ApiBadRequestResponse } from '@nestjs/swagger';
+import { AuthTokenResponseDto } from './auth-response.dto';
+import { ErrorResponseDto } from '../common/dto/error-response.dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -10,6 +12,9 @@ export class AuthController {
 
   @Post('login')
   @ApiOperation({ summary: 'Login e obtenção de token JWT' })
+  @ApiOkResponse({ type: AuthTokenResponseDto })
+  @ApiUnauthorizedResponse({ type: ErrorResponseDto })
+  @ApiBadRequestResponse({ type: ErrorResponseDto })
   async login(@Body() authDto: AuthDto) {
     const user = await this.authService.validateUser(authDto.usuario, authDto.senha);
     if (!user) {
