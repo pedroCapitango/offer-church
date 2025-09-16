@@ -5,7 +5,6 @@
     "tesouraria"
   ],
   "scripts": {
-    "postinstall": "cd tesouraria && npm install",
     "build": "cd tesouraria && npm run build",
     "start": "cd tesouraria && npm run start",
     "start:prod": "cd tesouraria && npm run start:prod"
