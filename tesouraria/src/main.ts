@@ -34,6 +34,14 @@ async function bootstrap() {
   // Filtro global de exceções para padronizar respostas de erro
   app.useGlobalFilters(new AllExceptionsFilter());
 
+  // CORS para permitir consumo pelo frontend (Vite em dev e origin configurável em prod)
+  app.enableCors({
+    origin: process.env.CORS_ORIGIN?.split(',') || true,
+    credentials: false,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  });
+
   // Garante que diretório de uploads exista (ex: Render ephemeral system no build step)
   const uploadDir = process.env.UPLOAD_DIR || 'uploads';
   const fullUploadPath = join(process.cwd(), uploadDir);
