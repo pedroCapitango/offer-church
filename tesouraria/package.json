@@ -12,7 +12,7 @@
   "start:dev": "prisma generate && nest start --watch",
     "start:debug": "nest start --debug --watch",
     "prisma:migrate:deploy": "prisma migrate deploy",
-    "start:prod": "npm run prisma:migrate:deploy && node dist/main",
+  "start:prod": "npm run prisma:migrate:deploy && node dist/src/main",
     "prisma:seed": "ts-node --transpile-only prisma/seed.ts",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
